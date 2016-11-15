@@ -4,6 +4,13 @@ Guzzle Services
 
 Provides an implementation of the Guzzle Command library that uses Guzzle service descriptions to describe web services, serialize requests, and parse responses into easy to use model structures.
 
+.. image:: https://travis-ci.org/Konafets/guzzle-services.svg?branch=guzzle6-pr1
+    :target: https://travis-ci.org/Konafets/guzzle-services
+.. image:: https://scrutinizer-ci.com/g/Konafets/guzzle-services/badges/quality-score.png?b=guzzle6-pr1
+    :target: https://scrutinizer-ci.com/g/Konafets/guzzle-services/?branch=guzzle6-pr1
+.. image:: https://scrutinizer-ci.com/g/Konafets/guzzle-services/badges/coverage.png?b=guzzle6-pr1
+    :target: https://scrutinizer-ci.com/g/Konafets/guzzle-services/?branch=guzzle6-pr1
+
 .. code-block:: php
 
     use GuzzleHttp\Client;
@@ -12,11 +19,11 @@ Provides an implementation of the Guzzle Command library that uses Guzzle servic
 
     $client = new Client();
     $description = new Description([
-        'baseUrl' => 'http://httpbin.org/',
+        'baseUri' => 'http://httpbin.org/',
         'operations' => [
             'testing' => [
                 'httpMethod' => 'GET',
-                'uri' => '/get/{foo}',
+                'uri' => '/get{?foo}',
                 'responseModel' => 'getResponse',
                 'parameters' => [
                     'foo' => [

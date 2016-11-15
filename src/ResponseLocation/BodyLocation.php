@@ -10,6 +10,23 @@ use Psr\Http\Message\ResponseInterface;
  */
 class BodyLocation extends AbstractLocation
 {
+
+    /**
+     * Set the name of the location
+     *
+     * @param string $locationName
+     */
+    public function __construct($locationName = 'body')
+    {
+        parent::__construct($locationName);
+    }
+
+    /**
+     * @param ResultInterface $result
+     * @param ResponseInterface $response
+     * @param Parameter $param
+     * @return ResultInterface
+     */
     public function visit(
         ResultInterface $result,
         ResponseInterface $response,

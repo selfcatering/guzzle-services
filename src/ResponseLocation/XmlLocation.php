@@ -14,16 +14,38 @@ class XmlLocation extends AbstractLocation
     /** @var \SimpleXMLElement XML document being visited */
     private $xml;
 
+    /**
+     * Set the name of the location
+     *
+     * @param string $locationName
+     */
+    public function __construct($locationName = 'xml')
+    {
+        parent::__construct($locationName);
+    }
+
+    /**
+     * @param ResultInterface $result
+     * @param ResponseInterface $response
+     * @param Parameter $model
+     * @return ResultInterface
+     */
     public function before(
         ResultInterface $result,
         ResponseInterface $response,
         Parameter $model
     ) {
-        $this->xml = simplexml_load_string($response->getBody()); // @TODO fix
+        $this->xml = simplexml_load_string((string) $response->getBody());
 
         return $result;
     }
 
+    /**
+     * @param ResultInterface $result
+     * @param ResponseInterface $response
+     * @param Parameter $model
+     * @return Result|ResultInterface
+     */
     public function after(
         ResultInterface $result,
         ResponseInterface $response,
@@ -45,6 +67,12 @@ class XmlLocation extends AbstractLocation
         return $result;
     }
 
+    /**
+     * @param ResultInterface $result
+     * @param ResponseInterface $response
+     * @param Parameter $param
+     * @return ResultInterface
+     */
     public function visit(
         ResultInterface $result,
         ResponseInterface $response,
@@ -103,6 +131,11 @@ class XmlLocation extends AbstractLocation
         return $result;
     }
 
+    /**
+     * @param Parameter $param
+     * @param \SimpleXMLElement $node
+     * @return array
+     */
     private function processArray(Parameter $param, \SimpleXMLElement $node)
     {
         // Cast to an array if the value was a string, but should be an array
@@ -190,7 +223,7 @@ class XmlLocation extends AbstractLocation
         } elseif ($additional === null || $additional === true) {
             // Blindly transform the XML into an array preserving as much data
             // as possible. Remove processed, aliased properties.
-            $array = array_diff_key(static::xmlToArray($node), $knownProps);
+            $array = array_diff_key(self::xmlToArray($node), $knownProps);
             // Remove @attributes that were explicitly plucked from the
             // attributes list.
             if (isset($array['@attributes']) && $knownAttributes) {
@@ -227,7 +260,7 @@ class XmlLocation extends AbstractLocation
         foreach ($children as $name => $child) {
             $attributes = (array) $child->attributes($ns, true);
             if (!isset($result[$name])) {
-                $childArray = static::xmlToArray($child, $ns, $nesting + 1);
+                $childArray = self::xmlToArray($child, $ns, $nesting + 1);
                 $result[$name] = $attributes
                     ? array_merge($attributes, $childArray)
                     : $childArray;
@@ -237,13 +270,13 @@ class XmlLocation extends AbstractLocation
             // that the node contains a list of elements
             if (!is_array($result[$name])) {
                 $result[$name] = [$result[$name]];
-            } else if (!isset($result[$name][0])) {
+            } elseif (!isset($result[$name][0])) {
                 // Convert the first child into the first element of a numerically indexed array
                 $firstResult = $result[$name];
                 $result[$name] = [];
                 $result[$name][] = $firstResult;
             }
-            $childArray = static::xmlToArray($child, $ns, $nesting + 1);
+            $childArray = self::xmlToArray($child, $ns, $nesting + 1);
             if ($attributes) {
                 $result[$name][] = array_merge($attributes, $childArray);
             } else {

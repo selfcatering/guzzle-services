@@ -1,11 +1,11 @@
 <?php
 namespace GuzzleHttp\Command\Guzzle\RequestLocation;
 
+use GuzzleHttp\Command\CommandInterface;
 use GuzzleHttp\Command\Guzzle\Operation;
 use GuzzleHttp\Command\Guzzle\Parameter;
-use GuzzleHttp\Command\CommandInterface;
-use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Psr7;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Creates an XML document
@@ -15,7 +15,7 @@ class XmlLocation extends AbstractLocation
     /** @var \XMLWriter XML writer resource */
     private $writer;
 
-    /** @var bool Content-Type header added when XML is found */
+    /** @var string Content-Type header added when XML is found */
     private $contentType;
 
     /** @var Parameter[] Buffered elements to write */
@@ -27,13 +27,19 @@ class XmlLocation extends AbstractLocation
      *     Content-Type header to a request if any XML content is added to the
      *     body. Pass an empty string to disable the addition of the header.
      */
-    public function __construct($locationName, $contentType = 'application/xml')
+    public function __construct($locationName = 'xml', $contentType = 'application/xml')
     {
-        $this->locationName = $locationName;
+        parent::__construct($locationName);
         $this->contentType = $contentType;
-        $this->data = new \SplObjectStorage();
     }
 
+    /**
+     * @param CommandInterface $command
+     * @param RequestInterface $request
+     * @param Parameter        $param
+     *
+     * @return RequestInterface
+     */
     public function visit(
         CommandInterface $command,
         RequestInterface $request,
@@ -47,8 +53,17 @@ class XmlLocation extends AbstractLocation
         } else {
             $this->buffered[] = $param;
         }
+
+        return $request;
     }
 
+    /**
+     * @param CommandInterface $command
+     * @param RequestInterface $request
+     * @param Operation        $operation
+     *
+     * @return RequestInterface
+     */
     public function after(
         CommandInterface $command,
         RequestInterface $request,
@@ -76,7 +91,7 @@ class XmlLocation extends AbstractLocation
         }
 
         // If data was found that needs to be serialized, then do so
-        $xml = null;
+        $xml = '';
         if ($this->writer) {
             $xml = $this->finishDocument($this->writer);
         } elseif ($operation->getData('xmlAllowEmpty')) {
@@ -85,7 +100,7 @@ class XmlLocation extends AbstractLocation
             $xml = $this->finishDocument($writer);
         }
 
-        if ($xml) {
+        if ($xml !== '') {
             $request = $request->withBody(Psr7\stream_for($xml));
             // Don't overwrite the Content-Type if one is set
             if ($this->contentType && !$request->hasHeader('Content-Type')) {
@@ -241,7 +256,7 @@ class XmlLocation extends AbstractLocation
      *
      * @param \XMLWriter $writer
      *
-     * @return \string the writer resource
+     * @return string the writer resource
      */
     protected function finishDocument($writer)
     {
@@ -252,6 +267,10 @@ class XmlLocation extends AbstractLocation
 
     /**
      * Add an array to the XML
+     *
+     * @param \XMLWriter $writer
+     * @param Parameter $param
+     * @param $value
      */
     protected function addXmlArray(\XMLWriter $writer, Parameter $param, &$value)
     {
@@ -264,6 +283,10 @@ class XmlLocation extends AbstractLocation
 
     /**
      * Add an object to the XML
+     *
+     * @param \XMLWriter $writer
+     * @param Parameter $param
+     * @param $value
      */
     protected function addXmlObject(\XMLWriter $writer, Parameter $param, &$value)
     {
@@ -286,6 +309,11 @@ class XmlLocation extends AbstractLocation
         }
     }
 
+    /**
+     * @param $value
+     * @param Parameter $param
+     * @param Operation $operation
+     */
     private function visitWithValue(
         $value,
         Parameter $param,

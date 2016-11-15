@@ -1,30 +1,59 @@
 <?php
 namespace GuzzleHttp\Command\Guzzle\RequestLocation;
 
-use GuzzleHttp\Command\Guzzle\Parameter;
-use Psr\Http\Message\RequestInterface;
-use GuzzleHttp\Command\Guzzle\Operation;
 use GuzzleHttp\Command\CommandInterface;
+use GuzzleHttp\Command\Guzzle\Operation;
+use GuzzleHttp\Command\Guzzle\Parameter;
+use GuzzleHttp\Psr7;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Adds query string values to requests
- * @TODO fix
  */
 class QueryLocation extends AbstractLocation
 {
+    /**
+     * Set the name of the location
+     *
+     * @param string $locationName
+     */
+    public function __construct($locationName = 'query')
+    {
+        parent::__construct($locationName);
+    }
+
+    /**
+     * @param CommandInterface $command
+     * @param RequestInterface $request
+     * @param Parameter        $param
+     *
+     * @return RequestInterface
+     */
     public function visit(
         CommandInterface $command,
         RequestInterface $request,
         Parameter $param
     ) {
-        $request->getQuery()[$param->getWireName()] = $this->prepareValue(
+        $uri = $request->getUri();
+        $query = Psr7\parse_query($uri->getQuery());
+
+        $query[$param->getWireName()] = $this->prepareValue(
             $command[$param->getName()],
             $param
         );
 
-        return $request;
+        $uri = $uri->withQuery(Psr7\build_query($query));
+
+        return $request->withUri($uri);
     }
 
+    /**
+     * @param CommandInterface $command
+     * @param RequestInterface $request
+     * @param Operation        $operation
+     *
+     * @return RequestInterface
+     */
     public function after(
         CommandInterface $command,
         RequestInterface $request,
@@ -34,10 +63,16 @@ class QueryLocation extends AbstractLocation
         if ($additional && $additional->getLocation() == $this->locationName) {
             foreach ($command->toArray() as $key => $value) {
                 if (!$operation->hasParam($key)) {
-                    $request->getQuery()[$key] = $this->prepareValue(
+                    $uri = $request->getUri();
+                    $query = Psr7\parse_query($uri->getQuery());
+
+                    $query[$key] = $this->prepareValue(
                         $value,
                         $additional
                     );
+
+                    $uri = $uri->withQuery(Psr7\build_query($query));
+                    $request = $request->withUri($uri);
                 }
             }
         }
