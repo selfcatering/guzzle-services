@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/guzzle/guzzle-services.svg?branch=guzzle6)](https://travis-ci.org/guzzle/guzzle-services)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/guzzle/guzzle-services/badges/quality-score.png?b=guzzle6)](https://scrutinizer-ci.com/g/guzzle/guzzle-services/?branch=guzzle6)
 [![Code Coverage](https://scrutinizer-ci.com/g/guzzle/guzzle-services/badges/coverage.png?b=guzzle6)](https://scrutinizer-ci.com/g/guzzle/guzzle-services/?branch=guzzle6)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/b08be676-b209-40b7-a6df-b6d13e8dff62/mini.png)](https://insight.sensiolabs.com/projects/b08be676-b209-40b7-a6df-b6d13e8dff62)
 [![Latest Stable Version](https://poser.pugx.org/guzzlehttp/guzzle-services/v/stable)](https://packagist.org/packages/guzzlehttp/guzzle-services)
 [![Latest Unstable Version](https://poser.pugx.org/guzzlehttp/guzzle-services/v/unstable)](https://packagist.org/packages/guzzlehttp/guzzle-services)
 [![Total Downloads](https://poser.pugx.org/guzzlehttp/guzzle-services/downloads)](https://packagist.org/packages/guzzlehttp/guzzle-services)
