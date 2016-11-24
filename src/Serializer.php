@@ -117,7 +117,7 @@ class Serializer
         $operation = $this->description->getOperation($command->getName());
 
         // If command does not specify a template, assume the client's base URL.
-        if (null === ($uri = $operation->getUri())) {
+        if (null === $operation->getUri()) {
             return new Request(
                 $operation->getHttpMethod(),
                 $this->description->getBaseUri()
