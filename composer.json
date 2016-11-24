@@ -13,6 +13,11 @@
             "name": "Jeremy Lindblom",
             "email": "jeremeamia@gmail.com",
             "homepage": "https://github.com/jeremeamia"
+        },
+        {
+            "name": "Stefano Kowalke",
+            "email": "blueduck@gmx.net",
+            "homepage": "https://github.com/konafets"
         }
     ],
     "require": {
