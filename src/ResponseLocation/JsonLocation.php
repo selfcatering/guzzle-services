@@ -180,23 +180,61 @@ class JsonLocation extends AbstractLocation
 
     /**
      * Single item arrays are not nested within arrays
-     * so wrap them to retain the same structure
+     * so wrap them to retain the same structure.
+     * Since the array is being iterated process changes by
+     * storing array children within a temporary key
+     * and reiterating array replacing original leafs
+     * with temporary elements
      */
     private function wrapSingleItemArrays(&$array)
     {
+        $this->initialSingleItemArrays($array);
+
+        return $this->cleanUpSingleItemArrays($array);
+    }
+
+    /**
+     * Create temporary array elements for single-child arrays
+     */
+    private function initialSingleItemArrays(&$array)
+    {
         foreach ($array as $key => $value) {
             if (gettype($value) === 'array') {
-                $array[$key] = $this->wrapSingleItemArrays($value);
+                $array[$key] = $this->initialSingleItemArrays($value);
             }
 
             // size found so find the only array
             // element that's within current leaf
             if ($key === '@size') {
-                foreach ($array as $childKey => $childValue) {
-                    if (gettype($childValue) === 'array' && ! isset($childValue[0])) {
-                        $array[$childKey] = [$childValue];
+                foreach ($array as $key => $value) {
+                    if (gettype($value) === 'array' && ! isset($value[0])) {
+                        // wrap single item element with an array
+                        $array[$key . '__temporary'] = [
+                            $this->initialSingleItemArrays($value)
+                        ];
+                        unset($array[$key]);
                     }
                 }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Convert temporary leafs into original array elements
+     */
+    private function cleanUpSingleItemArrays(&$array)
+    {
+        foreach ($array as $key => $value) {
+            if (gettype($value) === 'array') {
+                $array[$key] = $this->cleanUpSingleItemArrays($value);
+            }
+
+            if (gettype($key) === 'string' &&  stripos($key, '__temporary') !== false) {
+                $originalKey = str_replace('__temporary', '', $key);
+                $array[$originalKey] = $array[$key];
+                unset($array[$key]);
             }
         }
 

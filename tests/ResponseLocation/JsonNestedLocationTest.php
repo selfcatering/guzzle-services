@@ -22,7 +22,7 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
      */
     public function testVisitsNestedArrayOfObjects()
     {
-        $json = json_decode('{"Hotels":[{"HotelFees":{"@size":"1","HotelFee":{"@description":"MandatoryTax","@amount":"12.33"}}},{"HotelFees":{"@size":"2","HotelFee":[{"@description":"MandatoryTax","@amount":"13.96"},{"@description":"ResortFee","@amount":"14.09"}]}}]}');
+        $json = json_decode('{"Hotels":[{"HotelFees":{"@size":"1","HotelFee":{"@description":"MandatoryTax","@amount":"12.33","@size":"1","RoomTypes":{"id":123,"name":"Penthouse"}}}},{"HotelFees":{"@size":"2","HotelFee":[{"@description":"MandatoryTax","@amount":"13.96","@size":"1","RoomTypes":{"id":456,"name":"Penthouse"}},{"@description":"ResortFee","@amount":"14.09","@size":"2","RoomTypes":[{"id":234,"name":"Penthouse"},{"id":12,"name":"Apartment"}]}]}}]}');
 
         /*
         [
@@ -123,6 +123,13 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
                             [
                                 '@description' => 'MandatoryTax',
                                 '@amount' => '12.33',
+                                '@size' => '1',
+                                'RoomTypes' => [
+                                    [
+                                        'id' => 123,
+                                        'name' => 'Penthouse',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -134,10 +141,28 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
                             [
                                 '@description' => 'MandatoryTax',
                                 '@amount' => '13.96',
+                                '@size' => '1',
+                                'RoomTypes' => [
+                                    [
+                                        'id' => 456,
+                                        'name' => 'Penthouse',
+                                    ],
+                                ],
                             ],
                             [
                                 '@description' => 'ResortFee',
                                 '@amount' => '14.09',
+                                '@size' => '2',
+                                'RoomTypes' => [
+                                    [
+                                        'id' => 234,
+                                        'name' => 'Penthouse',
+                                    ],
+                                    [
+                                        'id' => 12,
+                                        'name' => 'Apartment',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
