@@ -82,11 +82,14 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
                                     'HotelFees' => [
                                         'type' => 'object',
                                         'properties' => [
+                                            // 1. if size is in here
                                             '@size' => [
                                                 'type' => 'integer',
                                             ],
                                             'HotelFee' => [
+                                                // 2. and array type is in here
                                                 'type' => 'array',
+                                                // 3. them items should be wrapped within
                                                 'items' => [
                                                     'type' => 'object',
                                                     '@description' => [
@@ -110,9 +113,6 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
         $guzzle = new GuzzleClient($httpClient, $description);
         /** @var ResultInterface $result */
         $result = $guzzle->foo();
-
-        var_dump($result->toArray());
-        die();
 
         $expected = [
             'Hotels' => [
@@ -144,6 +144,7 @@ class JsonNestedLocationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
+
         $this->assertEquals($expected, $result->toArray());
     }
 }

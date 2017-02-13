@@ -39,6 +39,10 @@ class JsonLocation extends AbstractLocation
         $body = (string) $response->getBody();
         $body = $body ?: "{}";
         $this->json = \GuzzleHttp\json_decode($body, true);
+
+        // wrap single item arrays with an array
+        $this->json = $this->wrapSingleItemArrays($this->json);
+
         // relocate named arrays, so that they have the same structure as
         //  arrays nested in objects and visit can work on them in the same way
         if ($model->getType() === 'array' && ($name = $model->getName())) {
@@ -172,5 +176,30 @@ class JsonLocation extends AbstractLocation
         }
 
         return $param->filter($result);
+    }
+
+    /**
+     * Single item arrays are not nested within arrays
+     * so wrap them to retain the same structure
+     */
+    private function wrapSingleItemArrays(&$array)
+    {
+        foreach ($array as $key => $value) {
+            if (gettype($value) === 'array') {
+                $array[$key] = $this->wrapSingleItemArrays($value);
+            }
+
+            // size found so find the only array
+            // element that's within current leaf
+            if ($key === '@size') {
+                foreach ($array as $childKey => $childValue) {
+                    if (gettype($childValue) === 'array' && ! isset($childValue[0])) {
+                        $array[$childKey] = [$childValue];
+                    }
+                }
+            }
+        }
+
+        return $array;
     }
 }
