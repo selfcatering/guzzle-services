@@ -36,4 +36,31 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $request = $serializer($command);
         $this->assertEquals('http://test.com/api/bar/foo', $request->getUri());
     }
+
+    public function testAllowsDefaultParameterUriTemplates()
+    {
+        $description = new Description([
+            'baseUri' => 'http://test.com',
+            'operations' => [
+                'test' => [
+                    'httpMethod'         => 'GET',
+                    'uri'                => '/api/{key}/foo',
+                    'parameters'         => [
+                        'key' => [
+                            'required'  => true,
+                            'type'      => 'string',
+                            'location'  => 'uri',
+                            'default'   => 'bar',
+                        ],
+                    ]
+                ]
+            ]
+        ]);
+
+        $command = new Command('test');
+        $serializer = new Serializer($description);
+        /** @var Request $request */
+        $request = $serializer($command);
+        $this->assertEquals('http://test.com/api/bar/foo', $request->getUri());
+    }
 }
